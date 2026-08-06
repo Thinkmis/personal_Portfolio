@@ -1,5 +1,7 @@
 import { Mail, Send, MapPin, Phone } from "lucide-react";
 import { Button } from "@/components/Button";
+import { useState } from "react";
+import emailjs from "@emailjs/browser";
 
 const GithubIcon = (props) => (
     <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -9,6 +11,62 @@ const GithubIcon = (props) => (
 );
 
 export const Contact = () => {
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+    });
+    const [isLoading, setIsLoading] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState({ type: null, message: "" });
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setSubmitStatus({ type: null, message: "" });
+
+        const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+        const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+        const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+        if (!serviceId || !templateId || !publicKey) {
+            setSubmitStatus({
+                type: "error",
+                message: "Email service is not configured yet.",
+            });
+            setIsLoading(false);
+            return;
+        }
+
+        try {
+            await emailjs.send(
+                serviceId,
+                templateId,
+                {
+                    name: formData.name,
+                    email: formData.email,
+                    subject: formData.subject,
+                    message: formData.message,
+                },
+                publicKey
+            );
+
+            setSubmitStatus({
+                type: "success",
+                message: "Message sent successfully!",
+            });
+            setFormData({ name: "", email: "", subject: "", message: "" });
+        } catch (error) {
+            console.error("EmailJS error:", error);
+            setSubmitStatus({
+                type: "error",
+                message: "Failed to send message. Please try again later.",
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <section id="contact" className="py-32 relative overflow-hidden bg-surface/30">
             <div className="container mx-auto px-6 relative z-10">
@@ -83,7 +141,7 @@ export const Contact = () => {
 
                     {/* Form */}
                     <form
-                        onSubmit={(e) => e.preventDefault()}
+                        onSubmit={handleSubmit}
                         className="glass p-8 rounded-2xl glow-border space-y-6"
                     >
                         <div className="grid sm:grid-cols-2 gap-6">
@@ -94,6 +152,8 @@ export const Contact = () => {
                                 <input
                                     type="text"
                                     placeholder="Enter your name"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     className="w-full px-4 py-3 rounded-xl glass border border-border focus:border-primary focus:outline-none text-foreground"
                                 />
                             </div>
@@ -104,6 +164,8 @@ export const Contact = () => {
                                 <input
                                     type="email"
                                     placeholder="your@email.com"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     className="w-full px-4 py-3 rounded-xl glass border border-border focus:border-primary focus:outline-none text-foreground"
                                 />
                             </div>
@@ -116,6 +178,8 @@ export const Contact = () => {
                             <input
                                 type="text"
                                 placeholder="Subject of message"
+                                value={formData.subject}
+                                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                                 className="w-full px-4 py-3 rounded-xl glass border border-border focus:border-primary focus:outline-none text-foreground"
                             />
                         </div>
@@ -127,13 +191,27 @@ export const Contact = () => {
                             <textarea
                                 rows={4}
                                 placeholder="Write your message here..."
+                                value={formData.message}
+                                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                                 className="w-full px-4 py-3 rounded-xl glass border border-border focus:border-primary focus:outline-none text-foreground resize-none"
                             />
                         </div>
 
-                        <Button size="lg" className="w-full">
-                            Send Message <Send className="w-4 h-4 ml-2" />
+                        <Button size="lg" className="w-full" type="submit" disabled={isLoading}>
+                            {isLoading ? "Sending..." : "Send Message"}
+                            <Send className="w-4 h-4 ml-2" />
                         </Button>
+
+                        {submitStatus.type && (
+                            <div
+                                className={`flex items-center gap-3 p-4 rounded-xl ${submitStatus.type === "success"
+                                    ? "bg-green-500/10 border border-green-500/20 text-green-400"
+                                    : "bg-red-500/10 border border-red-500/20 text-red-400"
+                                    }`}
+                            >
+                                <span>{submitStatus.message}</span>
+                            </div>
+                        )}
                     </form>
                 </div>
             </div>

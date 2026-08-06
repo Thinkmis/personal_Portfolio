@@ -7,7 +7,7 @@ const projects = [
         tags: ["HTML", "CSS", "JavaScript", "Dynamic UI"],
         liveUrl: "#",
         githubUrl: "https://github.com/Thinkmis",
-        image: "/hero-bg.jpg"
+        image: "/expense.png"
     },
     {
         title: "Bookshop Management System",
@@ -15,7 +15,7 @@ const projects = [
         tags: ["C Programming", "File Handling", "CLI", "Algorithms"],
         liveUrl: "#",
         githubUrl: "https://github.com/Thinkmis",
-        image: "/hero-bg.jpg"
+        image: "/book.png"
     },
     {
         title: "Personal Developer Portfolio",
@@ -23,7 +23,7 @@ const projects = [
         tags: ["React", "Tailwind CSS", "JavaScript", "Responsive Design"],
         liveUrl: "#",
         githubUrl: "https://github.com/Thinkmis",
-        image: "/hero-bg.jpg"
+        image: "/portfoliopic.PNG"
     }
 ];
 
